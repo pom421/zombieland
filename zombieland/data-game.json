@@ -1,0 +1,42 @@
+{
+  "soldiers": [
+    {
+      "type": "standard",
+      "name": "John Striker",
+      "PV": 3,
+      "PVMax": 3,
+      "level": 1
+    },
+    {
+      "type": "standard",
+      "name": "Ed Boomer",
+      "PV": 3,
+      "PVMax": 3,
+      "level": 1
+    },
+    {
+      "type": "standard",
+      "name": "Stan Wojcek",
+      "PV": 3,
+      "PVMax": 3,
+      "level": 1
+    }
+  ],
+
+  "city": {
+    "walls": [
+      {
+        "name": "wall1",
+        "PV": 10,
+        "PVMax": 10
+      }
+    ]
+  },
+
+  "wave": {
+    "num": 1,
+    "lap": 1
+  }
+  
+  
+}
