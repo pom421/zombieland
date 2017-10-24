@@ -1,29 +1,50 @@
 const data = require("./data-game.json")
 const chalk = require("chalk")
+const { load, showState } = require("./app/loader")
+const { promisify } = require("util")
+const { EventEmitter } = require("events")
+
+const dataFile = process.env.argv && process.env.argv[2] ? process.env.argv[2] : "./data/data-sample.txt"
+
+console.log("Fichier data utilisé : ", dataFile)
+
+const NB_WAVES_MAX = 5
 
 const game = {
   state: data,
+  eventEmitter: new EventEmitter(),
 
-  run: function() {
+  run: function(dataFile) {
     console.log(chalk.bgRed("\n-- Zombieland --\n"))
 
-    this.nextWave()
- 
+    this.addListeners()
+
+    // récuparation des données JSON et complètement des données (zombies, noms des soldats, etc..)
+    this.prepare(dataFile)
+
+  },
+
+  addListeners: function() {
+    this.eventEmitter.on("afterPrepare", this.nextWave.bind(this))
   },
 
   exit: function() {
     console.log(chalk.bgBlue("\n-- FIN --\n"))
+   showState(this.state, "FIN DU JEU")
 
-    this.showState()
-
-    this.state.zombies == 0 ? console.log(chalk.magenta("Vous avez gagné :D")) : console.log(chalk.red("Vous avez perdu :'("))
+    this.state.soldiers.length > 0 ? console.log(chalk.magenta("Vous avez gagné :D")) : console.log(chalk.red("Vous avez perdu :'("))
 
     console.log("\n")
 
     process.exit(0)
   },
-  
-  showState: function() {
+
+  prepare: function(dataFile) {
+    console.log("Récupération de l'état initial du jeu")
+    load(this.state, dataFile, this.eventEmitter)
+  },
+
+ showStateOld: function() {
     //console.log(`Vague N° ${ this.state.wave.num } | tour ${ this.state.wave.lap }\n`)
     
     console.log(`Il reste ${ this.state.soldiers.length } soldat(s) dans la ville.`)
@@ -37,7 +58,7 @@ const game = {
   
   nextWave: function () {
 
-    this.showState()
+    showState(this.state, "VAGUE SUIVANTE")
 
     this.state.zombies = this.nbZombies(this.state.wave.num)
 
@@ -53,7 +74,7 @@ const game = {
       this.attackZombies()
     }
       
-    if (this.state.soldiers.length == 0 || this.state.wave.num == 10 || this.state.zombies.length == 0) {
+    if (this.state.soldiers.length == 0 || this.state.zombies.length == 0 || this.state.wave.num == NB_WAVES_MAX) {
       this.exit()
     }
     // sinon
@@ -64,7 +85,7 @@ const game = {
 
   nbZombies: function(num) {
     // TODO un jour ajouter des zombies de différents types
-    return Array(10 + num * 5).fill()
+    return Array(5 + num * 5).fill()
   },
 
   attackSoldiers: function() {
@@ -125,7 +146,7 @@ const game = {
   showShapeSoldiers: function() {
     console.log("\n")
     this.state.soldiers.forEach( (soldier, index) => {
-      console.log(chalk.magenta(`${ index }. ${ soldier.name.padEnd(20) } PV ${ soldier.PV }/${ soldier.PVMax } | #kills ${ soldier.kills } | level ${ soldier.level }`))
+      console.log(chalk.magenta(`${ index }. ${ soldier.name.padEnd(20) } | ${ soldier.rank.padEnd(10) } | PV ${ soldier.PV }/${ soldier.PVMax } | #kills ${ soldier.kills } | level ${ soldier.level }`))
     }, this);
     console.log("\n")
   }
@@ -133,4 +154,4 @@ const game = {
 
 }
 
-game.run()
+game.run(dataFile)

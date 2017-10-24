@@ -4,11 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app ./data/data-sample.txt"
   },
   "author": "pom421 <mauguet.po@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "chalk": "^2.2.0"
+    "chalk": "^2.2.0",
+    "chance": "^1.0.11"
   }
 }
